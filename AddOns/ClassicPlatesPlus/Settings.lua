@@ -348,6 +348,28 @@ function func:Load_Settings()
 			func:Create_Slider(panel, flair, name, tooltip, cfg, default, step, minValue, maxValue, decimals);
 		end
 
+		-- CheckButton
+		do
+            local name = "個人資源條動畫效果";
+            local tooltip = "";
+            local cfg = "PersonalPowerBarAnimation";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+		-- CheckButton
+        do
+            local name = "淡出個人資源條";
+            local tooltip = "非戰鬥中淡出個人資源條";
+            local cfg = "PersonalNameplateFade";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = false };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
 		-- 滑桿
 		do
 			local name = "個人資源條縮放大小";
@@ -542,38 +564,93 @@ function func:Load_Settings()
 		-- 子類別
 		func:Create_SubCategory(panel, "只顯示名字");
 
-		-- 下拉式選單
-		do
-			local name = "只顯示名字";
-			local tooltip = "";
-			local cfg = "NamesOnly";
-			local default = 2;
-			local options = {
-				[1] = "無",
-				[2] = "友方",
-				[3] = "敵方",
-				[4] = "全部"
-			}
-			local flair = { classicEra = true, cata = true, retail = true };
+		-- CheckButton
+        do
+            local name = "友方玩家";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyPlayers";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
 
-			func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-		end
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
 
-		-- 下拉式選單
-		do
-			local name = "排除 NPC";
-			local tooltip = "";
-			local cfg = "NamesOnlyExcludeNPCs";
-			local default = 3;
-			local options = {
-				[1] = "無",
-				[2] = "全部",
-				[3] = "可攻擊的"
-			}
-			local flair = { classicEra = true, cata = true, retail = true };
+        -- CheckButton
+        do
+            local name = "敵方玩家";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyPlayers";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
 
-			func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
-		end
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "友方寵物";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyPets";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "敵方寵物";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyPets";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "友方 NPC";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyNPC";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "敵方 NPC";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyNPC";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "友方圖騰";
+            local tooltip = "";
+            local cfg = "NamesOnlyFriendlyTotems";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
+        -- CheckButton
+        do
+            local name = "敵方圖騰";
+            local tooltip = "";
+            local cfg = "NamesOnlyEnemyTotems";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
 
 		-- 核取按鈕
 		do
@@ -740,6 +817,17 @@ function func:Load_Settings()
             func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
         end
 
+		-- CheckButton
+        do
+            local name = "只顯示重要光環";
+            local tooltip = "";
+            local cfg = "AurasShowOnlyImportant";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
+
 		-- DropDownMenu
 		do
 			local name = "隱藏被動光環";
@@ -755,6 +843,17 @@ function func:Load_Settings()
 
 			func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
 		end
+
+		-- CheckButton
+        do
+            local name = "只有當前目標顯示光環";
+            local tooltip = "";
+            local cfg = "AurasOnTarget";
+            local default = false;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
 
 		-- CheckButton
 		do
@@ -820,6 +919,17 @@ function func:Load_Settings()
 
 			func:Create_DropDownMenu(panel, flair, name, tooltip, cfg, default, options);
 		end
+		
+		-- CheckButton
+        do
+            local name = "在浮動提示中顯示法術 ID";
+            local tooltip = "";
+            local cfg = "TooltipSpellID";
+            local default = true;
+            local flair = { classicEra = true, cata = true, retail = true };
+
+            func:Create_CheckButton(panel, flair, name, tooltip, cfg, default);
+        end
 
 		-- CheckButton
 		do

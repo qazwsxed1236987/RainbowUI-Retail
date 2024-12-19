@@ -262,7 +262,12 @@ local functionsTable = {
     -- Auras
     AurasFilterFriendly = function() updateAuras(); end,
     AurasFilterEnemy = function() updateAuras(); end,
+    AurasShowOnlyImportant = function() updateAuras(); end,
     AurasHidePassive = function() updateAuras(); end,
+    AurasOnTarget = function()
+        func:HideAllAuras();
+        updateAuras();
+    end,
     AurasCountdown = function() updateAurasVisuals(); end,
     AurasReverseAnimation = function() updateAurasVisuals(); end,
     MarkStealableAuras = function() updateAuras(); end,
@@ -322,8 +327,14 @@ local functionsTable = {
         updateNameplateScale();
         func:ResizeNameplates();
     end,
-    NamesOnly = function() updateNameplateVisuals(); end,
-    NamesOnlyExcludeNPCs = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyPlayers = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyPlayers = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyPets = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyPets = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyNPC = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyNPC = function() updateNameplateVisuals(); end,
+    NamesOnlyFriendlyTotems = function() updateNameplateVisuals(); end,
+    NamesOnlyEnemyTotems = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeFriends = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeGuild = function() updateNameplateVisuals(); end,
     NamesOnlyExcludeParty = function() updateNameplateVisuals(); end,
@@ -343,6 +354,7 @@ local functionsTable = {
         end
         func:PersonalNameplateAdd();
     end,
+    PersonalNameplateFade = function() func:ToggleNameplatePersonal(); end,
     SpecialPower = function() func:Update_ClassPower(); end,
     SpecialPowerScale = function() func:Update_ClassPower(); end,
     CastbarIconShow = function() updateNameplateVisuals(); end,

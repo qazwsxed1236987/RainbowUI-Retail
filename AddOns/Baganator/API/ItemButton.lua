@@ -37,6 +37,7 @@ local expansionIDToText = {
   [7] = "BfA",
   [8] = "SL",
   [9] = "DF",
+  [10] = "TWW",
 }
 
 local function CacheSettings()
@@ -273,6 +274,15 @@ end, function(itemButton)
   EquipmentSet:SetTexture("interface\\addons\\baganator\\assets\\equipment-set-shield")
   EquipmentSet:SetSize(15, 15)
   return EquipmentSet
+end)
+
+Baganator.API.RegisterCornerWidget(BAGANATOR_L_EQUIPMENT_SET_ICON, "equipment_set_icon", function(EquipmentSetIcon, details)
+  EquipmentSetIcon:SetTexture(details.setInfo and details.setInfo[1].iconTexture or nil)
+  return details.setInfo and details.setInfo[1].iconTexture ~= nil
+end, function(itemButton)
+  local EquipmentSetIcon = itemButton:CreateTexture(nil, "ARTWORK")
+  EquipmentSetIcon:SetSize(15, 15)
+  return EquipmentSetIcon
 end)
 
 addonTable.Utilities.OnAddonLoaded("CanIMogIt", function()

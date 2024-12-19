@@ -281,37 +281,20 @@ local function ApplyItemDetailSettings(button)
   end
 end
 
--- Scale button and set visuals as appropriate
-local function AdjustRetailButton(button)
-  if not button.SlotBackground then
-    button.emptyBackgroundAtlas = nil
-    button.SlotBackground = button:CreateTexture(nil, "BACKGROUND", nil, -1)
-    button.SlotBackground:SetAllPoints(button.icon)
-    button.SlotBackground:SetAtlas("bags-item-slot64")
-  end
-
-  button.SlotBackground:SetShown(not addonTable.Config.Get(addonTable.Config.Options.EMPTY_SLOT_BACKGROUND))
-
-  ApplyItemDetailSettings(button)
+local function AddRetailBackground(button)
+  button.emptyBackgroundAtlas = nil
+  button.SlotBackground = button:CreateTexture(nil, "BACKGROUND", nil, -1)
+  button.SlotBackground:SetAllPoints(button.icon)
+  button.SlotBackground:SetAtlas("bags-item-slot64")
 end
 
--- Scale button and set visuals as appropriate
-local function AdjustClassicButton(button)
-  if addonTable.Config.Get(addonTable.Config.Options.EMPTY_SLOT_BACKGROUND) then
-    if not button.BGR or button.BGR.itemLink == nil then
-      button.icon:SetTexture(nil)
-      button.icon:Hide()
-    end
+local function AddClassicBackground(button)
+  if not button.SlotBackground then
     button.emptySlotFilepath = nil
-  else
-    button.emptySlotFilepath = "Interface\\AddOns\\Baganator\\Assets\\classic-bag-slot"
-    if not button.BGR or button.BGR.itemLink == nil then
-      button.icon:Show()
-      button.icon:SetTexture(button.emptySlotFilepath)
-    end
+    button.SlotBackground = button:CreateTexture(nil, "BACKGROUND", nil, -1)
+    button.SlotBackground:SetAllPoints(button.icon)
+    button.SlotBackground:SetTexture("Interface\\AddOns\\Baganator\\Assets\\classic-bag-slot")
   end
-
-  ApplyItemDetailSettings(button)
 end
 
 local function FlashItemButton(self)
@@ -404,8 +387,12 @@ end
 
 BaganatorRetailCachedItemButtonMixin = {}
 
+function BaganatorRetailCachedItemButtonMixin:OnLoad()
+  AddRetailBackground(self)
+end
+
 function BaganatorRetailCachedItemButtonMixin:UpdateTextures()
-  AdjustRetailButton(self)
+  ApplyItemDetailSettings(self)
 end
 
 function BaganatorRetailCachedItemButtonMixin:SetItemDetails(details)
@@ -487,6 +474,7 @@ end
 BaganatorRetailLiveContainerItemButtonMixin = {}
 
 function BaganatorRetailLiveContainerItemButtonMixin:MyOnLoad()
+  AddRetailBackground(self)
   self:HookScript("OnClick", function()
     if not self.BGR or not self.BGR.itemID then
       return
@@ -560,7 +548,7 @@ function BaganatorRetailLiveContainerItemButtonMixin:MyOnLoad()
 end
 
 function BaganatorRetailLiveContainerItemButtonMixin:UpdateTextures()
-  AdjustRetailButton(self)
+  ApplyItemDetailSettings(self)
 end
 
 function BaganatorRetailLiveContainerItemButtonMixin:SetItemDetails(cacheData)
@@ -680,6 +668,7 @@ end
 BaganatorRetailLiveGuildItemButtonMixin = {}
 
 function BaganatorRetailLiveGuildItemButtonMixin:OnLoad()
+  AddRetailBackground(self)
   self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
   self:RegisterForDrag("LeftButton")
   self.SplitStack = function(button, split)
@@ -758,7 +747,7 @@ function BaganatorRetailLiveGuildItemButtonMixin:OnReceiveDrag()
 end
 
 function BaganatorRetailLiveGuildItemButtonMixin:UpdateTextures()
-  AdjustRetailButton(self)
+  ApplyItemDetailSettings(self)
 end
 
 function BaganatorRetailLiveGuildItemButtonMixin:SetItemDetails(cacheData, tabIndex)
@@ -819,132 +808,6 @@ function BaganatorRetailLiveGuildItemButtonMixin:SetItemFiltered(text)
   SetWidgetsAlpha(self, result)
 end
 
-BaganatorRetailLiveWarbandItemButtonMixin = {}
-
-function BaganatorRetailLiveWarbandItemButtonMixin:MyOnLoad()
-  self:HookScript("OnClick", function()
-    if not self.BGR or not self.BGR.itemID then
-      return
-    end
-
-    if IsAltKeyDown() then
-      addonTable.CallbackRegistry:TriggerEvent("HighlightSimilarItems", self.BGR.itemLink)
-    end
-  end)
-
-  hooksecurefunc(self, "UpdateItemContextMatching", function()
-    if self.widgetContainer then
-      if self.ItemContextOverlay:IsShown() then
-        SetWidgetsAlpha(self, false)
-      else
-        SetWidgetsAlpha(self, self.BGR == nil or self.BGR.matchesSearch ~= false)
-      end
-    end
-  end)
-end
-
-function BaganatorRetailLiveWarbandItemButtonMixin:UpdateTextures()
-  AdjustRetailButton(self)
-end
-
-function BaganatorRetailLiveWarbandItemButtonMixin:SetItemDetails(cacheData)
-  -- Mirror format used by container item buttons for compatiblity between
-  -- Baganator and Blizzard functions
-  self:SetBankTabID(self:GetParent():GetID())
-  self:SetContainerSlotID(self:GetID())
-
-  local info = C_Container.GetContainerItemInfo(self:GetBankTabID(), self:GetContainerSlotID())
-
-  -- Keep cache and display in sync
-  if info and not cacheData.itemLink then
-    info = nil
-  end
-
-  local texture = cacheData.iconTexture or (info and info.iconFileID);
-  local itemCount = cacheData.itemCount;
-  local locked = info and info.isLocked;
-  local quality = cacheData.quality or (info and info.quality);
-  local readable = info and info.isReadable;
-  local itemLink = info and info.hyperlink;
-  local noValue = info and info.hasNoValue;
-  local itemID = info and info.itemID;
-  local isBound = info and info.isBound;
-
-
-  ClearItemButtonOverlay(self);
-
-  self.icon:SetShown(texture ~= 0);
-  self:SetItemButtonTexture(texture);
-
-  self:SetItemButtonQuality(quality, nil, true, isBound);
-  SetItemButtonCount(self, itemCount);
-  SetItemButtonDesaturated(self, locked);
-
-  --self:UpdateNewItem(quality);
-  --self:UpdateJunkItem(quality, noValue);
-  --self:SetReadable(readable);
-  self:SetMatchesSearch(true)
-
-  if GameTooltip:IsOwned(self) then
-    GameTooltip:Hide()
-    BattlePetTooltip:Hide()
-  end
-
-  if self:IsMouseOver() then
-    self:OnEnter()
-  end
-
-  SetWidgetsAlpha(self, true)
-  ReparentOverlays(self)
-
-  GetInfo(self, cacheData, function()
-    self.BGR.tooltipGetter = function() return C_TooltipInfo.GetBagItem(self:GetBankTabID(), self:GetContainerSlotID()) end
-    self.BGR.hasNoValue = noValue
-    self:BGRUpdateQuests()
-  end, function()
-    self:BGRUpdateQuests()
-    self:UpdateItemContextMatching();
-    local doNotSuppressOverlays = false
-    self:SetItemButtonQuality(quality, itemLink, doNotSuppressOverlays, isBound);
-    ReparentOverlays(self)
-  end)
-end
-
-function BaganatorRetailLiveWarbandItemButtonMixin:BGRStartFlashing()
-  FlashItemButton(self)
-end
-
-function BaganatorRetailLiveWarbandItemButtonMixin:BGRSetHighlight(isHighlighted)
-  SetHighlightItemButton(self, isHighlighted)
-end
-
-function BaganatorRetailLiveWarbandItemButtonMixin:BGRUpdateQuests()
-  local questInfo = C_Container.GetContainerItemQuestInfo(self:GetBankTabID(), self:GetContainerSlotID());
-  local isQuestItem = questInfo.isQuestItem;
-  self.BGR.isQuestItem = questInfo.isQuestItem or questInfo.questID
-  local questID = questInfo.questID;
-  local isActive = questInfo.isActive;
-
-  if questID and not isActive then
-    self.IconQuestTexture:SetTexture(TEXTURE_ITEM_QUEST_BANG);
-  elseif questID or isQuestItem then
-    self.IconQuestTexture:SetTexture(TEXTURE_ITEM_QUEST_BORDER);
-  end
-  self.IconQuestTexture:SetShown(questID or isQuestItem);
-end
-
-function BaganatorRetailLiveWarbandItemButtonMixin:SetItemFiltered(text)
-  local result = SearchCheck(self, text)
-  if result == nil then
-    return true
-  end
-  if self.BGR ~= nil then
-    self.BGR.matchesSearch = result
-  end
-  self:SetMatchesSearch(result)
-  SetWidgetsAlpha(self, result and not self.ItemContextOverlay:IsShown())
-end
-
 local function ApplyQualityBorderClassic(self, quality)
   local color
 
@@ -962,8 +825,12 @@ end
 
 BaganatorClassicCachedItemButtonMixin = {}
 
+function BaganatorClassicCachedItemButtonMixin:OnLoad()
+  AddClassicBackground(self)
+end
+
 function BaganatorClassicCachedItemButtonMixin:UpdateTextures()
-  AdjustClassicButton(self)
+  ApplyItemDetailSettings(self)
 end
 
 function BaganatorClassicCachedItemButtonMixin:SetItemDetails(details)
@@ -1038,6 +905,7 @@ BaganatorClassicLiveContainerItemButtonMixin = {}
 -- Alter the item button so that the tooltip works both on bag items and bank
 -- items
 function BaganatorClassicLiveContainerItemButtonMixin:MyOnLoad()
+  AddClassicBackground(self)
   self:HookScript("OnClick", function()
     if not self.BGR or not self.BGR.itemID then
       return
@@ -1104,7 +972,7 @@ end
 -- end alterations
 
 function BaganatorClassicLiveContainerItemButtonMixin:UpdateTextures()
-  AdjustClassicButton(self)
+  ApplyItemDetailSettings(self)
 end
 
 function BaganatorClassicLiveContainerItemButtonMixin:SetItemDetails(cacheData)
@@ -1221,6 +1089,7 @@ end
 BaganatorClassicLiveGuildItemButtonMixin = {}
 
 function BaganatorClassicLiveGuildItemButtonMixin:OnLoad()
+  AddClassicBackground(self)
   self:RegisterForClicks("LeftButtonUp", "RightButtonUp")
   self:RegisterForDrag("LeftButton")
   self.SplitStack = function(button, split)
@@ -1288,7 +1157,7 @@ function BaganatorClassicLiveGuildItemButtonMixin:OnLeave()
 end
 
 function BaganatorClassicLiveGuildItemButtonMixin:UpdateTextures()
-  AdjustClassicButton(self)
+  ApplyItemDetailSettings(self)
 end
 
 function BaganatorClassicLiveGuildItemButtonMixin:SetItemDetails(cacheData, tabIndex)
